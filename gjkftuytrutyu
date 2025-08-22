@@ -1,0 +1,221 @@
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local player = Players.LocalPlayer
+local gui = Instance.new("ScreenGui")
+local frame = Instance.new("Frame")
+local title = Instance.new("TextLabel")
+local toggleButton = Instance.new("TextButton")
+local destroyButton = Instance.new("TextButton")
+local button1 = Instance.new("TextButton")
+local button2 = Instance.new("TextButton")
+local button3 = Instance.new("TextButton")
+local button4 = Instance.new("TextButton")
+
+-- GUI Setup
+gui.Name = "PrivateAntiAimGUI"
+gui.Parent = player.PlayerGui
+gui.ResetOnSpawn = false
+
+frame.Parent = gui
+frame.Size = UDim2.new(0, 220, 0, 250) -- Adjusted height: 30 (title) + 10 (margin) + 4 * 40 (buttons) + 3 * 10 (spacing) + 10 (bottom margin)
+frame.Position = UDim2.new(0.5, -110, 0.5, -125) -- Centered
+frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
+
+title.Parent = frame
+title.Size = UDim2.new(0, 140, 0, 30)
+title.Position = UDim2.new(0, 10, 0, 10)
+title.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+title.Text = "Private Anti-Aim"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.TextSize = 18
+title.Font = Enum.Font.SourceSansBold
+
+-- Toggle Button Setup
+toggleButton.Parent = frame
+toggleButton.Size = UDim2.new(0, 30, 0, 30)
+toggleButton.Position = UDim2.new(0, 160, 0, 10)
+toggleButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+toggleButton.Text = "-"
+toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+toggleButton.TextSize = 16
+toggleButton.Font = Enum.Font.SourceSans
+
+-- Destroy Button Setup
+destroyButton.Parent = frame
+destroyButton.Size = UDim2.new(0, 30, 0, 30)
+destroyButton.Position = UDim2.new(0, 190, 0, 10)
+destroyButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+destroyButton.Text = "X"
+destroyButton.TextColor3 = Color3.fromRGB(255, 0, 0)
+destroyButton.TextSize = 16
+destroyButton.Font = Enum.Font.SourceSans
+
+-- Button Setup
+local function createButton(name, position, scriptNum)
+	local btn = Instance.new("TextButton")
+	btn.Parent = frame
+	btn.Size = UDim2.new(0, 200, 0, 40)
+	btn.Position = UDim2.new(0, 10, 0, position)
+	btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+	btn.Text = name .. ": OFF"
+	btn.TextColor3 = Color3.fromRGB(255, 0, 0)
+	btn.TextSize = 16
+	btn.Font = Enum.Font.SourceSans
+	return btn
+end
+
+button1 = createButton("Function 1", 50, 1)
+button2 = createButton("Function 2", 100, 2)
+button3 = createButton("Function 3", 150, 3)
+button4 = createButton("Function 4", 200, 4)
+
+-- Script States
+local scriptsRunning = {false, false, false, false}
+local scriptCoroutines = {}
+local isGuiVisible = true
+
+-- Toggle GUI Functionality
+local function toggleGui()
+	isGuiVisible = not isGuiVisible
+	toggleButton.Text = isGuiVisible and "-" or "+"
+	
+	-- Show/hide buttons
+	button1.Visible = isGuiVisible
+	button2.Visible = isGuiVisible
+	button3.Visible = isGuiVisible
+	button4.Visible = isGuiVisible
+	
+	-- Adjust frame size based on visibility
+	frame.Size = isGuiVisible and UDim2.new(0, 220, 0, 250) or UDim2.new(0, 220, 0, 50)
+	
+	-- Stop all scripts when hiding
+	if not isGuiVisible then
+		for i = 1, 4 do
+			if scriptsRunning[i] then
+				scriptsRunning[i] = false
+				local btn = _G["button" .. i]
+				btn.Text = "Function " .. i .. ": OFF"
+				btn.TextColor3 = Color3.fromRGB(255, 0, 0)
+			end
+		end
+	end
+end
+
+toggleButton.MouseButton1Click:Connect(toggleGui)
+
+-- Destroy GUI Functionality
+local function destroyGui()
+	gui:Destroy()
+	for i = 1, 4 do
+		scriptsRunning[i] = false
+	end
+end
+
+destroyButton.MouseButton1Click:Connect(destroyGui)
+
+-- Script Functions
+local scripts = {
+	function() -- Function 1: 0-360 degrees
+		while true do
+			task.wait(0.085)
+			if not scriptsRunning[1] then return end
+			if player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character:FindFirstChild("Humanoid") then
+				local humanoidRootPart = player.Character.HumanoidRootPart
+				local randomAngle = math.rad(math.random(0, 360))
+				humanoidRootPart.CFrame = CFrame.new(humanoidRootPart.Position) * CFrame.Angles(0, randomAngle, 0)
+			end
+		end
+	end,
+	function() -- Function 2: 0-180 degrees
+		while true do
+			task.wait(0.085)
+			if not scriptsRunning[2] then return end
+			if player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character:FindFirstChild("Humanoid") then
+				local humanoidRootPart = player.Character.HumanoidRootPart
+				local randomAngle = math.rad(math.random(0, 180))
+				humanoidRootPart.CFrame = CFrame.new(humanoidRootPart.Position) * CFrame.Angles(0, randomAngle, 0)
+			end
+		end
+	end,
+	function() -- Function 3: 0-360 degrees (random)
+		while true do
+			task.wait(0.085)
+			if not scriptsRunning[3] then return end
+			if player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character:FindFirstChild("Humanoid") then
+				local humanoidRootPart = player.Character.HumanoidRootPart
+				local randomAngle = math.rad(math.random(0, 360))
+				humanoidRootPart.CFrame = CFrame.new(humanoidRootPart.Position) * CFrame.Angles(0, randomAngle, 0)
+			end
+		end
+	end,
+	function() -- Function 4: 0-180 degrees (random)
+		while true do
+			task.wait(0.085)
+			if not scriptsRunning[4] then return end
+			if player.Character and player.Character:FindFirstChild("HumanoidRootPart") and player.Character:FindFirstChild("Humanoid") then
+				local humanoidRootPart = player.Character.HumanoidRootPart
+				local randomAngle = math.rad(math.random(0, 180))
+				humanoidRootPart.CFrame = CFrame.new(humanoidRootPart.Position) * CFrame.Angles(0, randomAngle, 0)
+			end
+		end
+	end
+}
+
+-- Toggle Function
+local function toggleScript(button, scriptNum)
+	return function()
+		if not isGuiVisible then return end
+		scriptsRunning[scriptNum] = not scriptsRunning[scriptNum]
+		if scriptsRunning[scriptNum] then
+			button.Text = "Function " .. scriptNum .. ": ON"
+			button.TextColor3 = Color3.fromRGB(0, 255, 0)
+			if not scriptCoroutines[scriptNum] or coroutine.status(scriptCoroutines[scriptNum]) == "dead" then
+				scriptCoroutines[scriptNum] = coroutine.create(scripts[scriptNum])
+				coroutine.resume(scriptCoroutines[scriptNum])
+			end
+		else
+			button.Text = "Function " .. scriptNum .. ": OFF"
+			button.TextColor3 = Color3.fromRGB(255, 0, 0)
+			scriptsRunning[scriptNum] = false
+		end
+	end
+end
+
+-- Connect Buttons
+button1.MouseButton1Click:Connect(toggleScript(button1, 1))
+button2.MouseButton1Click:Connect(toggleScript(button2, 2))
+button3.MouseButton1Click:Connect(toggleScript(button3, 3))
+button4.MouseButton1Click:Connect(toggleScript(button4, 4))
+
+-- Ensure scripts stop when character dies
+player.CharacterRemoving:Connect(function()
+	for i = 1, 4 do
+		if scriptsRunning[i] then
+			scriptsRunning[i] = false
+			_G["button" .. i] = _G["button" .. i] or _G["button" .. i]
+			_G["button" .. i].Text = "Function " .. i .. ": OFF"
+			_G["button" .. i].TextColor3 = Color3.fromRGB(255, 0, 0)
+		end
+	end
+end)
+
+-- Handle camera to ensure first-person compatibility
+local function updateCamera()
+	if player.Character and player.Character:FindFirstChild("Humanoid") then
+		local humanoid = player.Character.Humanoid
+		humanoid.CameraOffset = Vector3.new(0, 0, 0)
+	end
+end
+
+player.CharacterAdded:Connect(function(character)
+	character:WaitForChild("Humanoid")
+	updateCamera()
+end)
+
+-- Initial camera setup if character already exists
+if player.Character then
+	updateCamera()
+end
